@@ -1,0 +1,11 @@
+{
+  "games": 18917,
+  "rows": 37834,
+  "errors": 0,
+  "error_samples": [],
+  "workers": 10,
+  "depth": 10,
+  "stockfish": "Stockfish 15.1",
+  "seconds": 4954.9,
+  "games_per_sec": 3.82
+}

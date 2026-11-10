@@ -1,0 +1,10 @@
+{
+  "challenger": "2",
+  "champion_before": null,
+  "challenger_mae": 276.6498,
+  "champion_mae": null,
+  "promoted": true,
+  "reason": "first model",
+  "smoke_test": "passed: 3 games answered by version 2",
+  "champion_after": "2"
+}
