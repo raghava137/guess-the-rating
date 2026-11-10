@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Guess the Rating</a>
+    <nav aria-label="Main">
+      <a href="index.html">Analyse a game</a>
+      <a href="pipeline.html">Pipeline</a>
+      <a href="help.html" aria-current="page">Help</a>
+    </nav>
+  </header>
+
+  <main class="prose">
+    <h1>How to use Guess the Rating</h1>
+    <p class="lede">The app looks at one blitz game and estimates how strong each player is,
+      as a Lichess blitz rating range.</p>
+
+    <h2>Estimate a game</h2>
+    <ol>
+      <li>Open a finished blitz game on lichess.org and copy the address from the browser, for example
+        <code>https://lichess.org/bcRJNu4b</code>. You can also paste the game's PGN instead.</li>
+      <li>Paste it into the box on the Analyse page. No game at hand? Press one of the example buttons.</li>
+      <li>Press <strong>Estimate ratings</strong> and wait a few seconds while Stockfish checks every move.</li>
+      <li>For each player you see the estimate, the likely range, and the three things that moved the estimate most.</li>
+      <li>Press <strong>Show real rating</strong> to compare the estimate with the rating in the game.</li>
+    </ol>
+
+    <h2>Reading the result</h2>
+    <ul>
+      <li>The big number is the model's best single estimate.</li>
+      <li>The green band on the bar is the range. The real rating falls inside it about 8 times in 10.</li>
+      <li>"Loss per move" (centipawns) measures how much worse a move was than Stockfish's choice.
+        100 centipawns is about one pawn. Stronger players lose fewer.</li>
+      <li>One game is a small sample. A player having a very good or very bad day will fool the model.</li>
+    </ul>
+
+    <h2>Which games work</h2>
+    <ul>
+      <li>Blitz only: 3 to 8 minutes per side, such as 3+0, 3+2, 5+0 or 5+3.</li>
+      <li>Standard chess, at least 10 moves by each side, with clock times. Lichess links always include clocks.</li>
+      <li>Games against computers and tournament berserk games are not supported.</li>
+    </ul>
+
+    <h2>When something goes wrong</h2>
+    <ul>
+      <li><strong>"This is not a blitz game"</strong>: the game used a bullet, rapid or classical clock.</li>
+      <li><strong>"The PGN has no clock times"</strong>: paste the Lichess link instead of the PGN.</li>
+      <li><strong>"The model server is not answering"</strong>: a new model may be loading. Try again in a minute.</li>
+      <li><strong>"All analysis engines are busy"</strong>: several people are using the app; try again shortly.</li>
+    </ul>
+
+    <h2>Pipeline page</h2>
+    <p>The Pipeline page is for whoever runs the app. It shows each pipeline run with its stages, speed and log,
+      the model versions and which one is serving, alerts, and live charts. Starting a run and rolling back to the previous model need the admin token from the <code>.env</code> file.</p>
+
+    <h2>Privacy</h2>
+    <p>Predictions are stored encrypted on the server for accuracy checks. Player names are not stored.</p>
+  </main>
+</body>
+</html>

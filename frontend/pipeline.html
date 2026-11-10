@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pipeline console</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Guess the Rating</a>
+    <nav aria-label="Main">
+      <a href="index.html">Analyse a game</a>
+      <a href="pipeline.html" aria-current="page">Pipeline</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Pipeline console</h1>
+    <p class="lede">Every run of the data and training pipeline, the models it produced, and live monitoring.
+      Starting runs and rolling back need the admin token.</p>
+
+    <section aria-labelledby="current-title">
+      <h2 id="current-title">Latest run</h2>
+      <ol class="stages" id="stages"></ol>
+      <p id="run-summary" class="hint">Loading…</p>
+    </section>
+
+    <div class="console-grid">
+      <div>
+        <section aria-labelledby="history-title">
+          <h2 id="history-title">Run history</h2>
+          <p class="hint">Select a run to see its log.</p>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Started</th><th>Trigger</th><th>Month</th><th>Result</th><th>Time</th><th>Model</th></tr></thead>
+              <tbody id="runs"></tbody>
+            </table>
+          </div>
+        </section>
+        <section aria-labelledby="log-title">
+          <h2 id="log-title">Log</h2>
+          <pre class="log" id="log">Select a run above.</pre>
+        </section>
+      </div>
+
+      <div>
+        <section class="models" aria-labelledby="models-title">
+          <h2 id="models-title">Models</h2>
+          <dl id="aliases"></dl>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Version</th><th>Test MAE</th><th>Decision</th></tr></thead>
+              <tbody id="versions"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="alerts-title">
+          <h2 id="alerts-title">Alerts</h2>
+          <table>
+            <thead><tr><th>Alert</th><th>State</th><th>What happened</th></tr></thead>
+            <tbody id="alerts"></tbody>
+          </table>
+        </section>
+
+        <section class="admin" aria-labelledby="admin-title">
+          <h2 id="admin-title">Admin</h2>
+          <div>
+            <label for="token">Admin token</label>
+            <input type="password" id="token" autocomplete="off" placeholder="ADMIN_TOKEN from the .env file">
+          </div>
+          <div class="row">
+            <select id="month-mode" aria-label="Which data to use">
+              <option value="">Same month</option>
+              <option value="next">Next month</option>
+              <option value="pick">Choose a month</option>
+            </select>
+            <input type="month" id="month" aria-label="Month" hidden>
+            <button type="button" id="start-run">Start pipeline run</button>
+          </div>
+          <p class="hint">"Same month" re-runs only the stages whose code, data or settings changed.</p>
+          <div class="row">
+            <button type="button" class="danger" id="rollback">Roll back to the previous model</button>
+          </div>
+          <p id="admin-status" class="status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </div>
+
+    <section aria-labelledby="live-title">
+      <h2 id="live-title">Live monitoring</h2>
+      <p class="hint">Panels from the Grafana dashboard, refreshed every 10 seconds.</p>
+      <div class="grafana" id="grafana"></div>
+    </section>
+
+    <section aria-labelledby="tools-title">
+      <h2 id="tools-title">Open the tools</h2>
+      <ul class="tools" id="tools"></ul>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="pipeline.js"></script>
+</body>
+</html>

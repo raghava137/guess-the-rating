@@ -1,0 +1,54 @@
+# Alert rules. Alertmanager forwards firing alerts to the backend, which shows them in the
+# pipeline console and, for FeatureDrift and LiveErrorHigh, can start a retraining run.
+groups:
+  - name: service
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "{{ $labels.job }} is not answering Prometheus scrapes."
+      - alert: ComponentDown
+        expr: chess_component_up == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "The {{ $labels.component }} service failed its health probe for 2 minutes."
+      - alert: HighErrorRate
+        expr: >
+          sum(rate(chess_http_requests_total{endpoint="predict", status=~"5.."}[5m]))
+          / clamp_min(sum(rate(chess_http_requests_total{endpoint="predict"}[5m])), 1e-9) > 0.05
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "More than 5% of predictions failed with a server error in the last 5 minutes."
+      - alert: SlowPredictions
+        expr: histogram_quantile(0.95, sum by (le) (rate(chess_http_request_seconds_bucket{endpoint="predict"}[5m]))) > 15
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "95th percentile prediction time is above 15 seconds."
+
+  - name: model
+    rules:
+      - alert: FeatureDrift          # the gauge only exists once 100 players are in the window
+        expr: max(chess_feature_psi) > 0.2
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "Live games differ from the training data (PSI above 0.2)."
+      - alert: LiveErrorHigh         # the gauge is NaN until 30 real ratings are known
+        expr: chess_live_mae > 1.5 * chess_model_test_mae
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "Live error is more than 1.5 times the test error."
+
+  - name: pipeline
+    rules:
+      - alert: PipelineFailed
+        expr: increase(chess_pipeline_runs_total{status="failed"}[1h]) > 0
+        labels: {severity: warning}
+        annotations:
+          summary: "A pipeline run failed in the last hour. See the pipeline console log."

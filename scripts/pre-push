@@ -1,0 +1,14 @@
+#!/bin/sh
+# Git pre-push hook: continuous integration on every push, inside the project's Docker image
+# (the same environment as the running app, so "works on my machine" problems show up here).
+# Install once:  cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+# The push is blocked if the style check or any test fails.
+set -e
+run() { docker compose run --rm --no-deps -T "$@"; }
+echo "flake8 (coding style)"
+run backend python -m flake8 src backend tests scripts
+echo "pytest (unit and API tests)"
+run backend python -m pytest -q --junitxml=reports/tests.xml
+echo "dvc status (is the pipeline up to date with the code and params?)"
+run pipeline dvc status || true
+echo "If dvc status lists stages, run the pipeline and commit dvc.lock."

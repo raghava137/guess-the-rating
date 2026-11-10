@@ -1,0 +1,11 @@
+.git
+.dvc/cache
+data
+models
+logs
+mlruns
+reports/plots
+**/__pycache__
+.pytest_cache
+.venv
+.env

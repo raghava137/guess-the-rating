@@ -1,0 +1,13 @@
+# Every alert goes to the backend webhook (shown in the pipeline console; may trigger retraining).
+route:
+  receiver: backend
+  group_by: [alertname]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+
+receivers:
+  - name: backend
+    webhook_configs:
+      - url: http://backend:8000/api/v1/alerts
+        send_resolved: true

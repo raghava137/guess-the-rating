@@ -1,0 +1,8 @@
+name: chess-rating
+
+python_env: python_env.yaml
+
+entry_points:
+  # DVC's train stage runs this entry point; settings come from params.yaml.
+  train:
+    command: "python src/train.py"

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guess the Rating</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Guess the Rating</a>
+    <nav aria-label="Main">
+      <a href="index.html" aria-current="page">Analyse a game</a>
+      <a href="pipeline.html">Pipeline</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>How strong were they?</h1>
+    <p class="lede">Paste one blitz game from Lichess. Stockfish checks every move and the clock,
+      and the model estimates each player's blitz rating as a range.</p>
+
+    <div class="analyse">
+      <form id="game-form" class="panel" novalidate>
+        <label for="game">Lichess game link or PGN</label>
+        <textarea id="game" name="game" required spellcheck="false"
+          placeholder="https://lichess.org/bcRJNu4b&#10;or paste the full PGN with clock times"></textarea>
+        <p class="hint">Blitz games only (3 to 8 minutes, like 3+0, 3+2 or 5+3), at least 10 moves each.</p>
+
+        <div class="examples" id="examples" hidden>
+          <span>No game at hand? Try one of these:</span>
+          <ul id="example-list"></ul>
+        </div>
+
+        <button type="submit" class="wide" id="submit">Estimate ratings</button>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+
+      <section id="result" aria-live="polite">
+        <div class="empty">The estimate for each player appears here, with the three things that mattered most.</div>
+      </section>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="analyse.js"></script>
+</body>
+</html>

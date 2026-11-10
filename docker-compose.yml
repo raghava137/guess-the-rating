@@ -1,0 +1,103 @@
+# Guess the Rating: nine services on one Docker network.
+#   web page      http://localhost:8080      Grafana     http://localhost:3000
+#   MLflow        http://localhost:5050      Prometheus  http://localhost:9090
+#   Ray dashboard http://localhost:8265      Alertmanager http://localhost:9093
+# The repository is mounted at /app, so the pipeline writes data/, models/ and reports/ into it.
+
+x-python: &python
+  build: .
+  image: chess-rating:latest
+  volumes:
+    - .:/app
+  env_file: .env
+  restart: unless-stopped
+
+services:
+  mlflow:
+    <<: *python
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --expose-prometheus /mlflow/metrics
+      --allowed-hosts "mlflow,mlflow:5000,localhost,localhost:5050,127.0.0.1:5050"
+    volumes:
+      - ./mlflow-data:/mlflow
+    ports: ["5050:5000"]           # 5000 is taken by AirPlay on macOS
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      retries: 12
+
+  model:                           # MLflow model server that follows the @champion alias
+    <<: *python
+    command: python src/serve_champion.py
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    depends_on:
+      mlflow: {condition: service_healthy}
+
+  backend:
+    <<: *python
+    command: uvicorn backend.app:app --host 0.0.0.0 --port 8000 --workers 1
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_URL: http://model:5001
+      RUNNER_URL: http://pipeline:8100
+      FRONTEND_URL: http://frontend
+    ports: ["8000:8000"]
+    depends_on:
+      mlflow: {condition: service_healthy}
+
+  frontend:
+    build: ./frontend
+    image: chess-rating-frontend:latest
+    ports: ["8080:80"]
+    depends_on: [backend]
+    restart: unless-stopped
+
+  pipeline:                        # runs `dvc repro` on request from the pipeline console
+    <<: *python
+    command: python src/runner.py
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      BACKEND_URL: http://backend:8000
+    volumes:
+      - .:/app
+      - ${HOME}/dvc-store:/dvc-store    # DVC remote (local folder outside the repo)
+    ports: ["8265:8265"]           # Ray dashboard while featurize runs
+    shm_size: 2gb                  # Ray's object store lives in shared memory
+    depends_on:
+      mlflow: {condition: service_healthy}
+
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports: ["9090:9090"]
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.34.0
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports: ["9093:9093"]
+    restart: unless-stopped
+
+  node-exporter:                   # host metrics (on macOS: the Docker Desktop VM)
+    image: prom/node-exporter:v1.12.1
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:13.2.3
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"     # read-only viewing, so panels can be embedded in the console
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_USERS_DEFAULT_THEME: light
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]
+    restart: unless-stopped

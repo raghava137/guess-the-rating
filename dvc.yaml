@@ -1,0 +1,111 @@
+# The pipeline as a DAG. `dvc repro` runs only what changed; `dvc dag` draws it.
+stages:
+  ingest:
+    cmd: python src/ingest.py
+    deps:
+      - src/ingest.py
+      - src/chessfeat/parse.py
+      - src/chessfeat/rules.py
+    params:
+      - month
+      - bands
+      - ingest
+    outs:
+      - data/raw/games.pgn
+    metrics:
+      - reports/ingest.json:
+          cache: false
+
+  validate:
+    cmd: python src/validate.py
+    deps:
+      - src/validate.py
+      - src/chessfeat/parse.py
+      - src/chessfeat/rules.py
+      - data/raw/games.pgn
+    outs:
+      - data/valid/games.pgn
+    metrics:
+      - reports/validation.json:
+          cache: false
+
+  featurize:
+    cmd: python src/featurize.py
+    deps:
+      - src/featurize.py
+      - src/chessfeat/features.py
+      - data/valid/games.pgn
+    params:                     # workers and batch size change speed, not results, so they are not listed
+      - featurize.depth
+      - featurize.hash_mb
+      - featurize.max_plies
+      - featurize.endgame_material
+    outs:
+      - data/features/features.parquet
+    metrics:
+      - reports/featurize.json:
+          cache: false
+
+  train:
+    cmd: mlflow run . -e train --env-manager local --experiment-name chess-rating
+    deps:
+      - MLproject
+      - src/train.py
+      - src/chessfeat/model.py
+      - src/chessfeat/drift.py
+      - data/features/features.parquet
+    params:
+      - train
+      - model_name
+    outs:
+      - models/candidate
+      - models/boosters
+    metrics:
+      - reports/train.json:
+          cache: false
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/candidate
+      - models/boosters
+      - data/features/features.parquet
+    params:
+      - bands
+      - train.seed
+      - model_name
+    metrics:
+      - reports/metrics.json:
+          cache: false
+    outs:
+      - reports/plots             # CSVs for `dvc plots` and PNG charts, versioned in the DVC remote
+
+  promote:
+    cmd: python src/promote.py
+    deps:
+      - src/promote.py
+      - reports/train.json        # a new registered version must always be judged
+      - reports/metrics.json
+    params:
+      - promote
+    outs:
+      - reports/promotion.json:
+          cache: false
+
+plots:
+  - reports/plots/predictions.csv:
+      template: scatter
+      x: actual
+      y: estimated
+      title: Estimated vs actual rating (test players)
+  - reports/plots/band_mae.csv:
+      template: bar_horizontal
+      x: mae
+      y: band
+      title: MAE by rating band
+  - reports/plots/feature_importance.csv:
+      template: bar_horizontal
+      x: gain
+      y: feature
+      title: Feature importance (median model)

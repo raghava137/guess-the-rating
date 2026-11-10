@@ -1,0 +1,13 @@
+# data and models are versioned by DVC, not Git
+/data
+/models
+# runtime files
+/logs
+/mlflow-data
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+.ipynb_checkpoints/
+# secrets
+.env

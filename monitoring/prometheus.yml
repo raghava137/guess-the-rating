@@ -1,0 +1,35 @@
+# Prometheus scrapes every component every 15 s and evaluates the alert rules.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: backend            # API traffic, latency, drift, live accuracy, health probes
+    static_configs:
+      - targets: ["backend:8000"]
+  - job_name: pipeline           # pipeline runs, stage durations, throughput
+    static_configs:
+      - targets: ["pipeline:8100"]
+  - job_name: mlflow             # MLflow tracking server (started with --expose-prometheus)
+    static_configs:
+      - targets: ["mlflow:5000"]
+  - job_name: node               # host CPU, memory, disk
+    static_configs:
+      - targets: ["node-exporter:9100"]
+  - job_name: alertmanager
+    static_configs:
+      - targets: ["alertmanager:9093"]
+  - job_name: grafana
+    static_configs:
+      - targets: ["grafana:3000"]
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
