@@ -424,7 +424,9 @@ def model_info():
         versions = client.search_model_versions(f"name='{MODEL_NAME}'", max_results=20,
                                                 order_by=["version_number DESC"])
     except Exception as exc:
-        raise HTTPException(502, f"MLflow is not reachable or has no model yet: {exc}")
+        if "RESOURCE_DOES_NOT_EXIST" in str(exc):     # before the first training run: no model yet
+            return {"name": MODEL_NAME, "served_version": None, "aliases": {}, "versions": []}
+        raise HTTPException(502, f"MLflow is not reachable: {exc}")
     return {"name": MODEL_NAME, "served_version": state["model_version"], "aliases": aliases,
             "versions": [{"version": v.version, "aliases": [a for a, n in aliases.items() if n == v.version],
                           "test_mae": v.tags.get("test_mae"), "promotion": v.tags.get("promotion")}

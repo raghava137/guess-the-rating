@@ -96,7 +96,7 @@ the repo folder (`data/`, `models/`, `logs/`, `mlflow-data/`) and are reused nex
 | Grafana dashboard "Guess the Rating" | http://localhost:3000 (admin / admin for editing) |
 | Prometheus (metrics, alert rules) | http://localhost:9090 |
 | Alertmanager | http://localhost:9093 |
-| Ray dashboard (only while featurize runs) | http://localhost:8265 |
+| Ray dashboard (only while featurize runs) | http://localhost:8265 (token: `docker compose exec pipeline ray get-auth-token`) |
 | Backend API docs (Swagger) | http://localhost:8000/docs |
 
 ## Everyday commands

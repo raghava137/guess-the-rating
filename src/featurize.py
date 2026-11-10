@@ -48,7 +48,7 @@ def main():
         texts = [text for _, text in iter_game_texts(handle)]
     batches = [texts[i:i + cfg["batch_size"]] for i in range(0, len(texts), cfg["batch_size"])]
 
-    ray.init(num_cpus=cfg["workers"], include_dashboard=cfg["ray_dashboard"],
+    ray.init(num_cpus=cfg["workers"], include_dashboard=cfg["ray_dashboard"], object_store_memory=500 * 2**20,
              dashboard_host="0.0.0.0", log_to_driver=False)
     actors = [FeatureWorker.remote(cfg) for _ in range(cfg["workers"])]
     engine_version = ray.get(actors[0].engine_version.remote())

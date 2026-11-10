@@ -17,7 +17,7 @@ Out of scope: browsers other than Chromium-based and Safari; HTTPS; multi-user a
 
 ## Unit and API test cases
 
-69 test cases in 35 test functions (parametrised cases counted separately).
+70 test cases in 36 test functions (parametrised cases counted separately).
 
 | ID | Test (file::function) | Cases | Checks |
 |---|---|---|---|
@@ -55,7 +55,8 @@ Out of scope: browsers other than Chromium-based and Safari; HTTPS; multi-user a
 | A6 | test_api::test_model_server_down_gives_503 | 1 | Clear 503 when the model is unavailable |
 | A7 | test_api::test_admin_actions_need_the_token | 2 | 401 without or with a wrong token |
 | A8 | test_api::test_drift_alert_starts_retraining_once_per_cooldown | 1 | Off, started, then cooldown |
-| A9 | test_api::test_metrics_are_exposed | 1 | Prometheus metrics present |
+| A9 | test_api::test_model_info_before_the_first_training_run | 1 | "No model yet" is a normal answer, not an error |
+| A10 | test_api::test_metrics_are_exposed | 1 | Prometheus metrics present |
 
 ## End-to-end checks
 

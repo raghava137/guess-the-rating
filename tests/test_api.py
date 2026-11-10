@@ -123,6 +123,15 @@ def test_drift_alert_starts_retraining_once_per_cooldown(client, monkeypatch):
     assert calls == [{"month": "next", "trigger": "alert"}]
 
 
+def test_model_info_before_the_first_training_run(client, monkeypatch):
+    class NoModel:
+        def get_registered_model(self, name):
+            raise Exception("RESOURCE_DOES_NOT_EXIST: Registered Model with name=chess-rating not found")
+    monkeypatch.setattr(backend.mlflow, "MlflowClient", NoModel)
+    response = client.get("/api/v1/model")
+    assert response.status_code == 200 and response.json()["versions"] == []
+
+
 def test_metrics_are_exposed(client):
     client.post("/api/v1/predict", json={"pgn": make_game()})
     text = client.get("/metrics").text

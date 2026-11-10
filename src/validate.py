@@ -54,7 +54,8 @@ def main():
     with open(ROOT / "data" / "raw" / "games.pgn") as handle:
         texts = [text for _, text in iter_game_texts(handle)]
     start = time.time()
-    ray.init(num_cpus=workers, include_dashboard=False, log_to_driver=False)
+    ray.init(num_cpus=workers, include_dashboard=False, log_to_driver=False,
+             object_store_memory=500 * 2**20)    # 500 MB is plenty for batches of PGN text
     size = max(1, len(texts) // (workers * 4) + 1)
     chunks = [texts[i:i + size] for i in range(0, len(texts), size)]
     games, counts = merge(ray.get([validate_chunk.remote(chunk) for chunk in chunks]))

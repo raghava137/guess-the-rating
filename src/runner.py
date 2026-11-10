@@ -26,6 +26,7 @@ log = get_logger("runner")
 RUNS_DIR = ROOT / "logs" / "runs"
 HISTORY = ROOT / "logs" / "runs.jsonl"
 STAGES = ["ingest", "validate", "featurize", "train", "evaluate", "promote"]
+ANSI = re.compile(r"\x1b\[[0-9;]*m")              # terminal colour codes that some tools print
 
 RUNS = Counter("chess_pipeline_runs_total", "Finished pipeline runs", ["status", "trigger"])
 RUNNING = Gauge("chess_pipeline_running", "1 while a pipeline run is in progress")
@@ -121,7 +122,7 @@ def execute(run):
             process = subprocess.Popen(["dvc", "repro"], cwd=ROOT, stdout=subprocess.PIPE,
                                        stderr=subprocess.STDOUT, text=True, bufsize=1)
             for line in process.stdout:
-                out.write(f"{datetime.now():%H:%M:%S} {line}")
+                out.write(f"{datetime.now():%H:%M:%S} {ANSI.sub('', line)}")       # no colour codes
                 out.flush()
                 found = parse_stage_line(line)
                 if found:
