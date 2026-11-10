@@ -4,7 +4,7 @@ FROM python:3.11-slim-bookworm
 
 # Stockfish for the features, git so MLflow and DVC can record the commit.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends stockfish git \
+    && apt-get install -y --no-install-recommends stockfish git libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 ENV PATH="/usr/games:${PATH}" \
     PYTHONPATH=/app/src:/app \
