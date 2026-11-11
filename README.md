@@ -16,6 +16,7 @@ DA3408 (AI Operations) end-semester project. Everything runs locally with Docker
 | [docs/test_report.md](docs/test_report.md) | Test results |
 | [docs/user_manual.md](docs/user_manual.md) | User manual for non-technical users |
 | [AI_DISCLOSURE.md](AI_DISCLOSURE.md) | How AI assistance was used |
+| [report/main.pdf](report/main.pdf) | Project report (LaTeX source in `report/main.tex`) |
 
 ## Repository layout
 

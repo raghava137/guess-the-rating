@@ -9,7 +9,7 @@ blitz rating. You do not need to know anything about computers or machine learni
 Whoever installed the app (see the README) starts it with `docker compose up -d`. Then open
 **http://localhost:8080** in a web browser (Chrome, Safari, Edge or Firefox) on that computer.
 
-`[Add your own screenshot here: docs/images/analyse-start.png - Start page]`
+![Start page](images/analyse-start.png)
 
 ## Estimate the ratings in a game
 
@@ -21,7 +21,7 @@ Whoever installed the app (see the README) starts it with `docker compose up -d`
 
 ## Read the result
 
-`[Add your own screenshot here: docs/images/analyse-result.png - Result with the real ratings revealed]`
+![Result for a game from August 2026, with the real ratings shown](images/analyse-result.png)
 
 For each player:
 
@@ -61,7 +61,7 @@ The page also adapts to narrow screens such as phones.
 
 Open **Pipeline** in the menu (http://localhost:8080/pipeline.html).
 
-`[Add your own screenshot here: docs/images/pipeline-console.png - Pipeline console]`
+![Pipeline console after the July 2026 run](images/pipeline-console.png)
 
 - **Latest run** shows the six steps of the last training run (get games, check them, analyse them with the engine,
   train, test, and decide whether to use the new model), how long each took, and the speed.
