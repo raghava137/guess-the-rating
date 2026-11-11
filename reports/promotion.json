@@ -1,10 +1,10 @@
 {
-  "challenger": "2",
-  "champion_before": null,
-  "challenger_mae": 276.6498,
-  "champion_mae": null,
-  "promoted": true,
-  "reason": "first model",
-  "smoke_test": "passed: 3 games answered by version 2",
+  "challenger": "3",
+  "champion_before": "2",
+  "challenger_mae": 277.1012,
+  "champion_mae": 280.40043604651163,
+  "promoted": false,
+  "reason": "MAE 277.1 not better than champion 280.4 by 5",
+  "smoke_test": "not run",
   "champion_after": "2"
 }

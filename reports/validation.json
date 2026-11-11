@@ -1,14 +1,14 @@
 {
   "games_in": 20000,
-  "games_valid": 18917,
+  "games_valid": 18825,
   "counts": {
     "checked": 20000,
-    "valid": 18917,
-    "too_short": 833,
-    "berserk_or_odd_clock": 259,
-    "unreadable": 4
+    "valid": 18825,
+    "too_short": 882,
+    "berserk_or_odd_clock": 302,
+    "unreadable": 2
   },
   "workers": 8,
-  "seconds": 26.2,
-  "games_per_sec": 764.0
+  "seconds": 27.7,
+  "games_per_sec": 721.6
 }

@@ -32,23 +32,23 @@ stages:
             https://database.lichess.org/standard/lichess_db_standard_rated_{month}.pgn.zst
           games_per_band: 2000
           max_games_read: 20000000
-        month: 2026-07
+        month: 2026-08
     outs:
     - path: data/raw/games.pgn
       hash: md5
-      md5: fa2a9d1e11c3120a4a5122b3703b1df0
-      size: 48479466
+      md5: 0765c731d267162e83a4596fc3f36920
+      size: 48429699
     - path: reports/ingest.json
       hash: md5
-      md5: 066622dbca89ed0bb08422766744d053
+      md5: 400ac5a21014815ee8897e6ba0bceed0
       size: 583
   validate:
     cmd: python src/validate.py
     deps:
     - path: data/raw/games.pgn
       hash: md5
-      md5: fa2a9d1e11c3120a4a5122b3703b1df0
-      size: 48479466
+      md5: 0765c731d267162e83a4596fc3f36920
+      size: 48429699
     - path: src/chessfeat/parse.py
       hash: md5
       md5: 311007281a67da482e545a3c67fa93a2
@@ -59,32 +59,32 @@ stages:
       size: 5967
     - path: src/validate.py
       hash: md5
-      md5: 62a82725faf0f547a1569eb75cec69d1
-      size: 2795
+      md5: c7b9107aea0490bf5603e3bb91b0edfb
+      size: 2887
     outs:
     - path: data/valid/games.pgn
       hash: md5
-      md5: a3a1d76702d8e41d23cde2ca8ff097b8
-      size: 47197196
+      md5: 7aa161957317294ca2c58a9133d252bd
+      size: 47000262
     - path: reports/validation.json
       hash: md5
-      md5: 38b9c63369cb5bc5e0f8953768fdf4d4
+      md5: 4272be6cca701503c953a795ca7a864c
       size: 244
   featurize:
     cmd: python src/featurize.py
     deps:
     - path: data/valid/games.pgn
       hash: md5
-      md5: a3a1d76702d8e41d23cde2ca8ff097b8
-      size: 47197196
+      md5: 7aa161957317294ca2c58a9133d252bd
+      size: 47000262
     - path: src/chessfeat/features.py
       hash: md5
       md5: d089e8c940ee1e0279f8b2b99d172a94
       size: 7225
     - path: src/featurize.py
       hash: md5
-      md5: 3b5c53a354eb67809ac7eb33cd490c49
-      size: 3155
+      md5: c3bf0fda2774e736d1b938524ca43c2d
+      size: 3188
     params:
       params.yaml:
         featurize.depth: 10
@@ -94,11 +94,11 @@ stages:
     outs:
     - path: data/features/features.parquet
       hash: md5
-      md5: 3f83a55b45911a48e2a99b611f18c997
-      size: 1952400
+      md5: 19f6a668ab90083202fc02a01fa8bcca
+      size: 1944378
     - path: reports/featurize.json
       hash: md5
-      md5: 818936c180dc06355048c89baac3356d
+      md5: 5948dd291a235f6aaa4f4b689f0d443c
       size: 186
   train:
     cmd: mlflow run . -e train --env-manager local --experiment-name 
@@ -110,8 +110,8 @@ stages:
       size: 184
     - path: data/features/features.parquet
       hash: md5
-      md5: 3f83a55b45911a48e2a99b611f18c997
-      size: 1952400
+      md5: 19f6a668ab90083202fc02a01fa8bcca
+      size: 1944378
     - path: src/chessfeat/drift.py
       hash: md5
       md5: 3d84719b0926c21b04c93f84e14b3aa0
@@ -137,34 +137,34 @@ stages:
     outs:
     - path: models/boosters
       hash: md5
-      md5: 26668461156fc1f4c3927dbc88f59e38.dir
-      size: 4024616
+      md5: 3611e8f2e4afbf9d2f1bc51745f26501.dir
+      size: 3695981
       nfiles: 4
     - path: models/candidate
       hash: md5
-      md5: f6c6921c99116e8b05b939929d96ce06.dir
-      size: 4049804
+      md5: 2b89baceabcb17afb59f05b9ce2212ca.dir
+      size: 3721533
       nfiles: 16
     - path: reports/train.json
       hash: md5
-      md5: 647a29e1542a75cc927c516dfbe1df4c
+      md5: cdf230ce25136e2b372cc366dab0c851
       size: 89
   evaluate:
     cmd: python src/evaluate.py
     deps:
     - path: data/features/features.parquet
       hash: md5
-      md5: 3f83a55b45911a48e2a99b611f18c997
-      size: 1952400
+      md5: 19f6a668ab90083202fc02a01fa8bcca
+      size: 1944378
     - path: models/boosters
       hash: md5
-      md5: 26668461156fc1f4c3927dbc88f59e38.dir
-      size: 4024616
+      md5: 3611e8f2e4afbf9d2f1bc51745f26501.dir
+      size: 3695981
       nfiles: 4
     - path: models/candidate
       hash: md5
-      md5: f6c6921c99116e8b05b939929d96ce06.dir
-      size: 4049804
+      md5: 2b89baceabcb17afb59f05b9ce2212ca.dir
+      size: 3721533
       nfiles: 16
     - path: src/evaluate.py
       hash: md5
@@ -187,23 +187,23 @@ stages:
     outs:
     - path: reports/metrics.json
       hash: md5
-      md5: 26897dd4cf312e960c1fb88eb54d7ce7
+      md5: 38c9af3b1f7193fa9462c22609e801fe
       size: 456
     - path: reports/plots
       hash: md5
-      md5: 30d79f9f169dc979d1786f1820bc48b1.dir
-      size: 348033
+      md5: 2d0d01b63f869dbeab17621c83f0555e.dir
+      size: 344383
       nfiles: 6
   promote:
     cmd: python src/promote.py
     deps:
     - path: reports/metrics.json
       hash: md5
-      md5: 26897dd4cf312e960c1fb88eb54d7ce7
+      md5: 38c9af3b1f7193fa9462c22609e801fe
       size: 456
     - path: reports/train.json
       hash: md5
-      md5: 647a29e1542a75cc927c516dfbe1df4c
+      md5: cdf230ce25136e2b372cc366dab0c851
       size: 89
     - path: src/promote.py
       hash: md5
@@ -220,5 +220,5 @@ stages:
     outs:
     - path: reports/promotion.json
       hash: md5
-      md5: 84abb505e61669a8e50e55a96cc067ba
-      size: 233
+      md5: 8970643e4d4e6860a0792686d22c3d80
+      size: 251

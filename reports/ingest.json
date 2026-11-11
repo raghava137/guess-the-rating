@@ -1,7 +1,7 @@
 {
-  "month": "2026-07",
-  "source": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
-  "games_read": 512504,
+  "month": "2026-08",
+  "source": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+  "games_read": 668552,
   "games_kept": 20000,
   "kept_per_band": {
     "<800": 2000,
@@ -16,11 +16,11 @@
     "2400+": 2000
   },
   "rejected": {
-    "not_blitz": 278002,
-    "bad_termination": 1527,
-    "bot_player": 2689,
-    "not_rated": 1042
+    "not_blitz": 407139,
+    "bad_termination": 2472,
+    "bot_player": 2494,
+    "not_rated": 3030
   },
-  "seconds": 151.9,
-  "games_read_per_sec": 3373.7
+  "seconds": 161.8,
+  "games_read_per_sec": 4132.2
 }

@@ -1,5 +1,5 @@
 # Every setting the pipeline uses. DVC re-runs only the stages whose params changed.
-month: "2026-07"                    # Lichess month to ingest (the runner can move this to the next month)
+month: "2026-08"                    # Lichess month to ingest (the runner can move this to the next month)
 model_name: chess-rating            # name in the MLflow model registry
 
 bands: [800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400]   # rating band edges for sampling and reports
