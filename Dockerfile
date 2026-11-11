@@ -2,7 +2,7 @@
 # Each service in docker-compose.yml runs a different command from it.
 FROM python:3.11-slim-bookworm
 
-# Stockfish for the features, git so MLflow and DVC can record the commit.
+# Stockfish for the features, git so MLflow and DVC can record the commit, libgomp1 for LightGBM.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends stockfish git libgomp1 \
     && rm -rf /var/lib/apt/lists/*

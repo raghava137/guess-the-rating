@@ -78,7 +78,7 @@ On a smaller machine (for example a VM with 6 CPUs and 5 GB), lower the parallel
    model server loads it within a minute.
 
    The first run streams one month of Lichess games (`month` in `params.yaml`). At
-   `games_per_band: 5000` this is up to 50,000 games for Stockfish, which takes hours. To measure
+   `games_per_band: 2000` (what I used) this is up to 20,000 games for Stockfish, which took 86 minutes on my Mac. To measure
    your Mac's speed first, set `games_per_band: 200`, run once, and read "Stockfish features ... games/s"
    on the console. Then raise it.
 
