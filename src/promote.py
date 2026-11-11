@@ -9,7 +9,7 @@ If the gate passes: @previous = old champion, @champion = challenger. The model 
 checks that the new version answers correctly. If it does not, the aliases are rolled back.
 
 `python src/promote.py --smoke-only` runs only the smoke test against the current champion.
-Output: reports/promotion.json
+Output: results/promotion.json
 """
 
 import argparse
@@ -142,10 +142,10 @@ def main():
         log.info("smoke test %s: %s", "passed" if passed else "FAILED", detail)
         sys.exit(0 if passed else 1)
 
-    metrics, challenger = read_json("reports/metrics.json"), read_json("reports/train.json")["version"]
+    metrics, challenger = read_json("results/metrics.json"), read_json("results/train.json")["version"]
     before = {alias: alias_version(client, name, alias) for alias in ("champion", "previous")}
     if challenger == before["champion"]:             # e.g. only evaluate was re-run: nothing to decide
-        write_json("reports/promotion.json", {"challenger": challenger, "champion_before": challenger,
+        write_json("results/promotion.json", {"challenger": challenger, "champion_before": challenger,
                                               "champion_after": challenger, "promoted": False,
                                               "reason": "challenger is already the champion", "smoke_test": "not run"})
         log.info("version %s is already @champion; nothing to do", challenger)
@@ -175,7 +175,7 @@ def main():
     status = "promoted" if report["promoted"] else ("rolled back" if report.get("rolled_back") else "rejected")
     client.set_model_version_tag(name, challenger, "promotion", f"{status}: {reason}")
     report["champion_after"] = alias_version(client, name, "champion")
-    write_json("reports/promotion.json", report)
+    write_json("results/promotion.json", report)
     log.info("champion is now version %s", report["champion_after"])
 
 

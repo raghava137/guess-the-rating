@@ -2,7 +2,7 @@
 
 DVC runs this through `mlflow run . -e train` (see MLproject), so the MLflow run records the
 entry point, the Git commit and the parameters. The new version gets the alias @challenger.
-Output: models/candidate (local copy, versioned by DVC) and reports/train.json
+Output: models/candidate (local copy, versioned by DVC) and results/train.json
 """
 
 import hashlib
@@ -68,7 +68,7 @@ def main():
     boosters_dir.mkdir(parents=True, exist_ok=True)
     mlflow.set_experiment("chess-rating")     # ignored when `mlflow run` already started a run
     with mlflow.start_run() as run:
-        featurize = read_json("reports/featurize.json")
+        featurize = read_json("results/featurize.json")
         mlflow.log_params({
             "month": params["month"], "games_per_band": params["ingest"]["games_per_band"],
             "stockfish_depth": params["featurize"]["depth"], "stockfish": featurize["stockfish"],
@@ -105,7 +105,7 @@ def main():
         version = info.registered_model_version
         mlflow.MlflowClient().set_registered_model_alias(name, "challenger", version)
 
-    write_json("reports/train.json", {"run_id": run.info.run_id, "version": version, "val_mae": round(val_mae, 2)})
+    write_json("results/train.json", {"run_id": run.info.run_id, "version": version, "val_mae": round(val_mae, 2)})
     log.info("registered %s version %s as @challenger (val MAE %.1f)", name, version, val_mae)
 
 

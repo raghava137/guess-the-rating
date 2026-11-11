@@ -2,7 +2,7 @@
 
 This project was built with substantial help from Claude, an AI assistant made by Anthropic,
 used through the Claude app. This file records what the assistant did, what I did, and how the
-work was checked. Edit the "My own work" section to keep it accurate as the project goes on.
+work was checked.
 
 ## What the assistant did
 
@@ -41,9 +41,8 @@ and the defence of every design choice are mine.
 - Ran the traffic, drift and load tests, and filled in docs/test_report.md and the report from those runs.
 - Found and reported the problems that came up on my machine (LightGBM's missing `libgomp1` in the Docker
   image, the Ray dashboard login, the project folder syncing to iCloud), which were then fixed.
-- Changes I made myself: (list them here, if any).
 
-## Responsibility (confirm before submitting)
+## Responsibility
 
 I am responsible for this submission. I have reviewed the code and documents, I can explain every
 part of them, and the results I report come from my own runs.

@@ -79,7 +79,7 @@ def run_summary():
     """Throughput of the data stages and the promotion decision, read from the stage reports."""
     def report(name):
         try:
-            return json.loads((ROOT / "reports" / f"{name}.json").read_text())
+            return json.loads((ROOT / "results" / f"{name}.json").read_text())
         except (OSError, ValueError):
             return {}
     ingest, validation, featurize = report("ingest"), report("validation"), report("featurize")

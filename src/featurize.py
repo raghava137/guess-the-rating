@@ -2,7 +2,7 @@
 
 Each actor owns one Stockfish process (engines cannot be shared between processes), so
 N actors use N CPU cores. Progress and throughput are logged while it runs.
-Output: data/features/features.parquet (two rows per game) and reports/featurize.json
+Output: data/features/features.parquet (two rows per game) and results/featurize.json
 """
 
 import time
@@ -67,7 +67,7 @@ def main():
     out_path = ROOT / "data" / "features" / "features.parquet"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_parquet(out_path, index=False)
-    write_json("reports/featurize.json", {
+    write_json("results/featurize.json", {
         "games": len(texts), "rows": len(rows), "errors": len(errors), "error_samples": errors[:5],
         "workers": cfg["workers"], "depth": cfg["depth"], "stockfish": engine_version,
         "seconds": round(seconds, 1), "games_per_sec": round(len(texts) / max(seconds, 1e-9), 2),

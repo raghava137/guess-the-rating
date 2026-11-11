@@ -91,4 +91,4 @@ Out of scope: browsers other than Chromium-based and Safari; HTTPS; multi-user a
 
 Tests run in the project's Docker image (Python 3.11, Stockfish from Debian) or a local Python 3.11
 environment with `requirements.txt`. The JUnit report for the test report comes from
-`python -m pytest --junitxml=reports/tests.xml`.
+`python -m pytest --junitxml=results/tests.xml`.

@@ -38,7 +38,7 @@ stages:
       hash: md5
       md5: 0765c731d267162e83a4596fc3f36920
       size: 48429699
-    - path: reports/ingest.json
+    - path: results/ingest.json
       hash: md5
       md5: 400ac5a21014815ee8897e6ba0bceed0
       size: 583
@@ -66,7 +66,7 @@ stages:
       hash: md5
       md5: 7aa161957317294ca2c58a9133d252bd
       size: 47000262
-    - path: reports/validation.json
+    - path: results/validation.json
       hash: md5
       md5: 4272be6cca701503c953a795ca7a864c
       size: 244
@@ -96,7 +96,7 @@ stages:
       hash: md5
       md5: 19f6a668ab90083202fc02a01fa8bcca
       size: 1944378
-    - path: reports/featurize.json
+    - path: results/featurize.json
       hash: md5
       md5: 5948dd291a235f6aaa4f4b689f0d443c
       size: 186
@@ -145,7 +145,7 @@ stages:
       md5: 2b89baceabcb17afb59f05b9ce2212ca.dir
       size: 3721533
       nfiles: 16
-    - path: reports/train.json
+    - path: results/train.json
       hash: md5
       md5: cdf230ce25136e2b372cc366dab0c851
       size: 89
@@ -185,11 +185,11 @@ stages:
         model_name: chess-rating
         train.seed: 42
     outs:
-    - path: reports/metrics.json
+    - path: results/metrics.json
       hash: md5
       md5: 38c9af3b1f7193fa9462c22609e801fe
       size: 456
-    - path: reports/plots
+    - path: results/plots
       hash: md5
       md5: 2d0d01b63f869dbeab17621c83f0555e.dir
       size: 344383
@@ -197,11 +197,11 @@ stages:
   promote:
     cmd: python src/promote.py
     deps:
-    - path: reports/metrics.json
+    - path: results/metrics.json
       hash: md5
       md5: 38c9af3b1f7193fa9462c22609e801fe
       size: 456
-    - path: reports/train.json
+    - path: results/train.json
       hash: md5
       md5: cdf230ce25136e2b372cc366dab0c851
       size: 89
@@ -218,7 +218,7 @@ stages:
           smoke_games: 3
           smoke_timeout_s: 180
     outs:
-    - path: reports/promotion.json
+    - path: results/promotion.json
       hash: md5
       md5: 8970643e4d4e6860a0792686d22c3d80
       size: 251

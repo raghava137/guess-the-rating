@@ -13,7 +13,7 @@ stages:
     outs:
       - data/raw/games.pgn
     metrics:
-      - reports/ingest.json:
+      - results/ingest.json:
           cache: false
 
   validate:
@@ -26,7 +26,7 @@ stages:
     outs:
       - data/valid/games.pgn
     metrics:
-      - reports/validation.json:
+      - results/validation.json:
           cache: false
 
   featurize:
@@ -43,7 +43,7 @@ stages:
     outs:
       - data/features/features.parquet
     metrics:
-      - reports/featurize.json:
+      - results/featurize.json:
           cache: false
 
   train:
@@ -61,7 +61,7 @@ stages:
       - models/candidate
       - models/boosters
     metrics:
-      - reports/train.json:
+      - results/train.json:
           cache: false
 
   evaluate:
@@ -76,35 +76,35 @@ stages:
       - train.seed
       - model_name
     metrics:
-      - reports/metrics.json:
+      - results/metrics.json:
           cache: false
     outs:
-      - reports/plots             # CSVs for `dvc plots` and PNG charts, versioned in the DVC remote
+      - results/plots             # CSVs for `dvc plots` and PNG charts, versioned in the DVC remote
 
   promote:
     cmd: python src/promote.py
     deps:
       - src/promote.py
-      - reports/train.json        # a new registered version must always be judged
-      - reports/metrics.json
+      - results/train.json        # a new registered version must always be judged
+      - results/metrics.json
     params:
       - promote
     outs:
-      - reports/promotion.json:
+      - results/promotion.json:
           cache: false
 
 plots:
-  - reports/plots/predictions.csv:
+  - results/plots/predictions.csv:
       template: scatter
       x: actual
       y: estimated
       title: Estimated vs actual rating (test players)
-  - reports/plots/band_mae.csv:
+  - results/plots/band_mae.csv:
       template: bar_horizontal
       x: mae
       y: band
       title: MAE by rating band
-  - reports/plots/feature_importance.csv:
+  - results/plots/feature_importance.csv:
       template: bar_horizontal
       x: gain
       y: feature

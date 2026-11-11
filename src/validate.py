@@ -1,7 +1,7 @@
 """Stage 2 - validate: fully parse every ingested game in parallel Ray tasks and drop bad ones.
 
 Each task validates one chunk; duplicates across chunks are removed when results are merged.
-Output: data/valid/games.pgn and reports/validation.json (rejections counted by reason)
+Output: data/valid/games.pgn and results/validation.json (rejections counted by reason)
 """
 
 import time
@@ -66,7 +66,7 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("".join(text.rstrip("\n") + "\n\n" for text in games))
     rate = len(texts) / max(seconds, 1e-9)
-    write_json("reports/validation.json", {
+    write_json("results/validation.json", {
         "games_in": len(texts), "games_valid": len(games), "counts": counts,
         "workers": workers, "seconds": round(seconds, 1), "games_per_sec": round(rate, 1),
     })

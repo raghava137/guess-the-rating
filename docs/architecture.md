@@ -2,7 +2,7 @@
 
 ![Architecture diagram](architecture.png)
 
-Source: [architecture.mmd](architecture.mmd) (Mermaid). Nine services run on one Docker Compose network.
+Nine services run on one Docker Compose network.
 Four of them (`mlflow`, `model`, `backend`, `pipeline`) use the same Python image with different
 commands; `frontend` is its own nginx image; the four monitoring services use the official images.
 

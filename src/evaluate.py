@@ -1,6 +1,6 @@
 """Stage 5 - evaluate: score the candidate model on the held-out test players.
 
-Metrics go to reports/metrics.json (DVC metrics), CSVs to reports/plots/ (DVC plots), and
+Metrics go to results/metrics.json (DVC metrics), CSVs to results/plots/ (DVC plots), and
 the same metrics plus PNG charts to the MLflow run that trained the model. The test MAE is
 also stored as a tag on the registered version so the backend can compare live error to it.
 """
@@ -22,7 +22,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402  (backend must be chosen before pyplot is imported)
 
 log = get_logger("evaluate")
-PLOTS = ROOT / "reports" / "plots"
+PLOTS = ROOT / "results" / "plots"
 
 
 def score(actual, low, mid, high):
@@ -113,9 +113,9 @@ def main():
     charts = save_charts(test, band_mae, importance)
 
     rounded = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in metrics.items()}
-    write_json("reports/metrics.json", rounded)
+    write_json("results/metrics.json", rounded)
 
-    trained = read_json("reports/train.json")
+    trained = read_json("results/train.json")
     with mlflow.start_run(run_id=trained["run_id"]):
         mlflow.log_metrics({k if k.startswith("test_") else f"test_{k}": v
                             for k, v in metrics.items() if isinstance(v, (int, float))})

@@ -2,7 +2,7 @@
 #   web page      http://localhost:8080      Grafana     http://localhost:3000
 #   MLflow        http://localhost:5050      Prometheus  http://localhost:9090
 #   Ray dashboard http://localhost:8265      Alertmanager http://localhost:9093
-# The repository is mounted at /app, so the pipeline writes data/, models/ and reports/ into it.
+# The repository is mounted at /app, so the pipeline writes data/, models/ and results/ into it.
 
 x-python: &python
   build: .

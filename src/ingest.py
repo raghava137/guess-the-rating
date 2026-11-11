@@ -2,7 +2,7 @@
 
 Only tag lines are inspected here (fast). Games are never fully downloaded or decompressed to
 disk: the stream stops as soon as every rating band is full or the read cap is reached.
-Output: data/raw/games.pgn and reports/ingest.json
+Output: data/raw/games.pgn and results/ingest.json
 """
 
 import io
@@ -81,7 +81,7 @@ def main():
         "games_kept": sum(kept.values()), "kept_per_band": kept, "rejected": rejected,
         "seconds": round(seconds, 1), "games_read_per_sec": round(read / max(seconds, 1e-9), 1),
     }
-    write_json("reports/ingest.json", report)
+    write_json("results/ingest.json", report)
     log.info("kept %d of %d games read in %.0f s", report["games_kept"], read, seconds)
     short = [band for band, n in kept.items() if n < cfg["games_per_band"]]
     if short:

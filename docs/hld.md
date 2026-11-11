@@ -2,7 +2,6 @@
 
 ![High-level design](hld.png)
 
-Source: [hld.mmd](hld.mmd).
 
 ## 1. Problem and success metrics
 
@@ -26,7 +25,7 @@ game, as a range, and says why.
   no bot players, normal or time-forfeit endings. Ingest keeps up to `games_per_band` games per rating band
   (by average rating), so strong and weak players are not drowned out by the 1200-1800 majority.
 - **Validation**: every game is fully parsed; games shorter than 20 plies, without clocks, with odd starting
-  clocks (tournament berserk) or duplicated are dropped and counted by reason (`reports/validation.json`).
+  clocks (tournament berserk) or duplicated are dropped and counted by reason (`results/validation.json`).
 - **Split**: by player, with a hash of the player name, 70/15/15. One player never appears in two splits,
   and the same player lands in the same split every month, so a later month's test set stays unseen.
 
@@ -34,7 +33,7 @@ game, as a range, and says why.
 
 - Lichess ratings are not FIDE or chess.com ratings; the app says "Lichess blitz rating".
 - Rating bands are balanced in sampling, but the extremes (below 800, above 2400) have fewer games, so
-  their error is higher (see per-band MAE in `reports/metrics.json`).
+  their error is higher (see per-band MAE in `results/metrics.json`).
 - One game is noisy: tilt, a time scramble or a short game can mislead the model. The range shows this.
 - Players who play many games are more likely to be sampled; the split by player prevents leakage
   but not this over-representation.

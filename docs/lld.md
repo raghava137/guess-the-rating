@@ -122,7 +122,7 @@ Run record (one JSON line per run in `logs/runs.jsonl`):
  "stages": {"ingest": {"status": "done", "seconds": 0.3}, "train": {"status": "skipped", "seconds": 0}},
  "throughput": {"ingest": 74137.1, "validate": 16.5, "featurize": 0.94},
  "games": {"read": 360, "kept": 236, "valid": 235, "featurized": 235},
- "test_mae": 212.5, "promotion": {"...": "contents of reports/promotion.json"}}
+ "test_mae": 212.5, "promotion": {"...": "contents of results/promotion.json"}}
 ```
 
 The log of each run is `logs/runs/<id>.log`. `throughput` is games per second of each data stage.
@@ -155,12 +155,12 @@ The log of each run is `logs/runs/<id>.log`. `throughput` is games per second of
 
 | Stage | Command | Inputs | Outputs |
 |---|---|---|---|
-| ingest | `python src/ingest.py` | Lichess month (URL in params) | `data/raw/games.pgn`, `reports/ingest.json` |
-| validate | `python src/validate.py` | raw games | `data/valid/games.pgn`, `reports/validation.json` |
-| featurize | `python src/featurize.py` | valid games | `data/features/features.parquet` (2 rows per game), `reports/featurize.json` |
-| train | `mlflow run . -e train --env-manager local` | features | `models/candidate`, `models/boosters`, `reports/train.json`; registry version with `@challenger` |
-| evaluate | `python src/evaluate.py` | features, candidate | `reports/metrics.json`, `reports/plots/*.csv` and PNGs; MLflow test metrics and tags |
-| promote | `python src/promote.py` | metrics, registry | `reports/promotion.json`; alias changes |
+| ingest | `python src/ingest.py` | Lichess month (URL in params) | `data/raw/games.pgn`, `results/ingest.json` |
+| validate | `python src/validate.py` | raw games | `data/valid/games.pgn`, `results/validation.json` |
+| featurize | `python src/featurize.py` | valid games | `data/features/features.parquet` (2 rows per game), `results/featurize.json` |
+| train | `mlflow run . -e train --env-manager local` | features | `models/candidate`, `models/boosters`, `results/train.json`; registry version with `@challenger` |
+| evaluate | `python src/evaluate.py` | features, candidate | `results/metrics.json`, `results/plots/*.csv` and PNGs; MLflow test metrics and tags |
+| promote | `python src/promote.py` | metrics, registry | `results/promotion.json`; alias changes |
 
 ## 6. Prometheus metrics (names as exposed)
 

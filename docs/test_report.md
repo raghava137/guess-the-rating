@@ -7,7 +7,7 @@ Data months: 2026-07 (training) and 2026-08 (next-month check).
 
 ## 1. Unit and API tests
 
-`docker compose exec backend python -m pytest -q --junitxml=reports/tests.xml`
+`docker compose exec backend python -m pytest -q --junitxml=results/tests.xml`
 
 | Tests | Passed | Failed | Skipped |
 |---|---|---|---|
@@ -60,11 +60,11 @@ rest queue, which is why p95 rises. Normal traffic (100 games) and drift traffic
 
 | Metric | Value | Source |
 |---|---|---|
-| Test MAE (v2, July) | 276.6 (RMSE 352.7, within 200 points 45.3%) | reports/metrics.json |
-| Baseline MAE (constant median) | 483.2 | reports/metrics.json |
-| Baseline MAE (line on ACPL) | 414.6 | reports/metrics.json |
-| Coverage of the range | 0.767 (average width 851) | reports/metrics.json |
-| Champion MAE on the next month (v2 on August players) | 280.4 (August baselines 484.8 and 411.0) | August reports/promotion.json |
+| Test MAE (v2, July) | 276.6 (RMSE 352.7, within 200 points 45.3%) | results/metrics.json |
+| Baseline MAE (constant median) | 483.2 | results/metrics.json |
+| Baseline MAE (line on ACPL) | 414.6 | results/metrics.json |
+| Coverage of the range | 0.767 (average width 851) | results/metrics.json |
+| Champion MAE on the next month (v2 on August players) | 280.4 (August baselines 484.8 and 411.0) | August results/promotion.json |
 | New model on August (v3) | MAE 277.1, coverage 0.766; not promoted: "MAE 277.1 not better than champion 280.4 by 5" | August reports |
 
 ## 5. Acceptance criteria

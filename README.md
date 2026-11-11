@@ -9,32 +9,39 @@ DA3408 (AI Operations) end-semester project. Everything runs locally with Docker
 
 | Document | What it covers |
 |---|---|
+| [report.pdf](report.pdf) | **Project report**: data, model, results, system, testing |
+| [docs/user_manual.md](docs/user_manual.md) | User manual for non-technical users |
 | [docs/architecture.md](docs/architecture.md) | Architecture diagram and what each block does |
 | [docs/hld.md](docs/hld.md) | High-level design: choices and why |
 | [docs/lld.md](docs/lld.md) | Low-level design: every API endpoint with inputs and outputs |
 | [docs/test_plan.md](docs/test_plan.md) | Test plan, test cases, acceptance criteria |
 | [docs/test_report.md](docs/test_report.md) | Test results |
-| [docs/user_manual.md](docs/user_manual.md) | User manual for non-technical users |
 | [AI_DISCLOSURE.md](AI_DISCLOSURE.md) | How AI assistance was used |
-| [report/main.pdf](report/main.pdf) | Project report (LaTeX source in `report/main.tex`) |
 
 ## Repository layout
 
 ```
-backend/app.py          FastAPI backend: the only service the web page talks to
-frontend/               web page (HTML, CSS, JS) and its nginx config and Dockerfile
-src/chessfeat/          shared library: PGN parsing, game rules, Stockfish features, model, drift
-src/ingest.py ...       one file per pipeline stage: ingest, validate, featurize, train, evaluate, promote
-src/runner.py           pipeline runner service behind the pipeline console
-src/serve_champion.py   MLflow model server that follows the @champion alias
-tests/                  unit and API tests (pytest)
-monitoring/             Prometheus config and alert rules, Alertmanager, Grafana dashboard
-scripts/                git pre-push hook (CI), smoke test, traffic and load test
-notebooks/eda.ipynb     exploratory data analysis
-dvc.yaml, params.yaml   the pipeline DAG and all its settings
-MLproject, python_env.yaml   MLflow project (same environment for training everywhere)
-Dockerfile, docker-compose.yml   one Python image + nginx frontend + monitoring images
+report.pdf, docs/        the report and all design, test and user documents
+backend/app.py           FastAPI backend: the only service the web page talks to
+frontend/                web pages (HTML, CSS, JS), nginx config and Dockerfile
+src/chessfeat/           shared library: PGN parsing, game rules, Stockfish features, model, drift
+src/ingest.py ...        one file per pipeline stage: ingest, validate, featurize, train, evaluate, promote
+src/runner.py            runs the pipeline for the Pipeline page
+src/serve_champion.py    MLflow model server that always serves the @champion model
+results/                 what each pipeline stage wrote last: game counts, speed, metrics,
+                         promotion decision, and the test results (tests.xml)
+tests/                   unit and API tests (pytest)
+monitoring/              Prometheus and alert rules, Alertmanager, Grafana dashboard
+scripts/                 pre-push hook (CI), smoke test, traffic and load test
+notebooks/eda.ipynb      exploratory data analysis
+dvc.yaml, dvc.lock       pipeline stages, and the exact data and model hashes of the last run
+params.yaml              every setting: month, sample size, Stockfish depth, model, promotion gate
+MLproject, python_env.yaml           MLflow project (training entry point)
+Dockerfile, docker-compose.yml       one Python image, the nginx frontend and the monitoring images
+requirements.txt, setup.cfg          Python packages, flake8 settings
 ```
+
+Created when you run it (not in Git): `data/` and `models/` (versioned by DVC), `logs/`, `mlflow-data/`.
 
 ## Setup (macOS or Linux)
 
@@ -122,7 +129,7 @@ All of these run inside the `pipeline` container, where DVC, MLflow and the data
 | `docker compose exec pipeline python scripts/traffic.py --api http://frontend` | Sends real games to the app so the dashboards fill |
 | `docker compose exec pipeline python scripts/load_test.py --api http://frontend --clients 4 --requests 40` | Load test: throughput and latency percentiles |
 
-Commit your code before a run, and commit `dvc.lock` and `reports/` after it: `dvc.lock` records the exact
+Commit your code before a run, and commit `dvc.lock` and `results/` after it: `dvc.lock` records the exact
 data and model hashes, so any run can be reproduced from a Git commit plus its MLflow run ID
 (`git_commit` is logged as a parameter, so it only identifies the code if the code was committed).
 

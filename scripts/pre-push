@@ -8,7 +8,7 @@ run() { docker compose run --rm --no-deps -T "$@"; }
 echo "flake8 (coding style)"
 run backend python -m flake8 src backend tests scripts
 echo "pytest (unit and API tests)"
-run backend python -m pytest -q --junitxml=reports/tests.xml
+run backend python -m pytest -q --junitxml=results/tests.xml
 echo "dvc status (is the pipeline up to date with the code and params?)"
 run pipeline dvc status || true
 echo "If dvc status lists stages, run the pipeline and commit dvc.lock."
