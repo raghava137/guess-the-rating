@@ -72,6 +72,45 @@ pinned requirements and the `chessfeat` code, so the model server needs nothing 
 - **DVC** defines the six-stage DAG (`dvc.yaml`) with all settings in `params.yaml`. `dvc repro` reruns only
   stages whose code, data or params changed. Data and models are DVC outputs pushed to a local remote;
   `dvc.lock` in Git pins their hashes. Metrics and plots are DVC metrics and plots; tuning uses `dvc exp run`.
+
+  The DAG as `dvc dag` draws it (evaluate needs both the features and the trained model):
+
+  ```
+            +--------+
+            | ingest |
+            +--------+
+                 *
+                 *
+                 *
+           +----------+
+           | validate |
+           +----------+
+                 *
+                 *
+                 *
+          +-----------+
+          | featurize |
+          +-----------+
+           **         **
+         **             **
+        *                 **
+  +-------+                 *
+  | train |*                *
+  +-------+ ****            *
+      *         ***         *
+      *            ****     *
+      *                **   *
+      *               +----------+
+       **             | evaluate |
+         **           +----------+
+           **         **
+             **     **
+               *   *
+            +---------+
+            | promote |
+            +---------+
+  ```
+
 - **Ray** does the heavy data engineering: validate is split into Ray tasks; featurize uses a pool of Ray actors,
   each owning one Stockfish process (an engine cannot be shared between processes).
 - **MLflow** tracks every training run (`mlflow run . -e train`, from the `MLproject` with `python_env.yaml`),

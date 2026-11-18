@@ -2,7 +2,7 @@
 
 Results of the tests in [test_plan.md](test_plan.md), from my own runs on real Lichess data, on my machine, with Docker.
 
-Machine: Mac with a 12-core CPU and 18 GB RAM; Docker Desktop given 12 CPUs and 13.9 GiB. Date: 10-11 November 2026.
+Machine: Mac with a 12-core CPU and 18 GB RAM; Docker Desktop given 12 CPUs and 13.9 GiB. Dates: 10, 11 and 18 November 2026.
 Data months: 2026-07 (training) and 2026-08 (next-month check).
 
 ## 1. Unit and API tests
@@ -32,11 +32,11 @@ The pre-push hook also runs these tests before every push.
 | E3 | Model reload and smoke test | Pass: "passed: 3 games answered by version 2" |
 | E4 | Web page: example game, Lichess link, pasted PGN, bad inputs | Pass. Plain text ("hello") and a non-Lichess link (`https://example.com/x`) both got HTTP 422 with "That does not look like a Lichess game link (e.g. https://lichess.org/bcRJNu4b)."; other invalid inputs also gave readable messages |
 | E5 | Drift loop (`scripts/traffic.py --drift`) | Pass. 120 long games (over 100 half-moves) sent, all answered. Max PSI 6.25; FeatureDrift went to pending and fired after 10 minutes ([screenshot](images/feature-drift-firing.png)). `AUTO_RETRAIN` was off, so no retraining was started |
-| E6 | Forced alerts (7 rules) | ComponentDown fired while no model was served and resolved after the first promotion; FeatureDrift fired in E5. Others not forced on my machine |
-| E7 | Broken model rolled back | Not repeated on my machine (checked during development, see appendix) |
+| E6 | Forced alerts (7 rules) | 4 of 7 fired: ComponentDown (no model served before the first promotion, resolved after it), FeatureDrift (E5), PipelineFailed (E10), TargetDown (node-exporter stopped for 2 minutes; fired after its 1-minute wait, [screenshot](images/targetdown-firing.png)). HighErrorRate, SlowPredictions and LiveErrorHigh were not forced: they need sustained 5xx errors, p95 above 15 s, or 30 real ratings with a large error |
+| E7 | Broken model rolled back | Pass. Simulated a deployment that never comes up: the promotion margin was set to -10 so version 3 passed the gate, and the model server was stopped. Promote moved @champion to 3, the smoke test failed ("backend still serves version None after 180 s") and @champion went back to 2 by itself (`"rolled_back": true`). The margin was then set back to 5 and promote re-run, which rejected version 3 as before |
 | E8 | Load test | table below |
-| E9 | Fresh clone + `dvc pull` + `dvc repro -f evaluate` gives the same metrics | Not repeated on my machine (checked during development) |
-| E10 | A failed run leaves the workspace usable | Not repeated on my machine (checked during development) |
+| E9 | Fresh clone + `dvc pull` + `dvc repro -f -s evaluate` gives the same metrics | Pass. Fresh clone inside the pipeline container, data pulled from the DVC remote, evaluate re-run: MAE 277.1, coverage 0.77, baselines 484.8 and 411.0, identical to the committed `results/metrics.json` |
+| E10 | A failed run leaves the workspace usable | Pass. A run on month 2030-01 failed at ingest after 2 s (Lichess 404, shown in the console log, [screenshot](images/failed-run-log.png)); `params.yaml` went back to 2026-08 and the next run succeeded in 1 s with every stage skipped. PipelineFailed fired |
 
 ### Pipeline speed
 
@@ -77,9 +77,9 @@ rest queue, which is why p95 rises. Normal traffic (100 games) and drift traffic
 | AC4 | All unit tests pass, flake8 clean | Met: 70/70, 0 flake8 errors |
 | AC5 | Readable 4xx for invalid input, no 500s | Met: readable 422 messages for bad inputs (E4), no 500s in 270 requests |
 | AC6 | Stack starts with one `docker compose up` | Met |
-| AC7 | Fresh clone reproduces the metrics | Not repeated on my machine |
-| AC8 | Every component up in Prometheus; each alert fires in a forced test | Partly: all 7 targets up; ComponentDown and FeatureDrift fired; the other five not forced on my machine |
-| AC9 | Broken model rolled back automatically | Not repeated on my machine |
+| AC7 | Fresh clone reproduces the metrics | Met (E9) |
+| AC8 | Every component up in Prometheus; each alert fires in a forced test | Partly: all 7 targets up; 4 of 7 alerts fired in forced tests (E6) |
+| AC9 | Broken model rolled back automatically | Met (E7) |
 
 ## 6. Known limitations
 
