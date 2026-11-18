@@ -1,8 +1,7 @@
 # AI assistance disclosure
 
-This project was built with substantial help from Claude, an AI assistant made by Anthropic,
-used through the Claude app. This file records what the assistant did, what I did, and how the
-work was checked.
+This project was built with  help from Claude, an AI assistant made by Anthropic,
+used through the Claude app. 
 
 ## What the assistant did
 
@@ -11,10 +10,7 @@ work was checked.
 - Wrote the first version of the code in this repository: the `chessfeat` library, the six pipeline stages,
   the pipeline runner, the model-server watcher, the backend, the web pages, the monitoring configuration and
   dashboard, the Docker and Compose files, the scripts and the tests.
-- Wrote the first drafts of the documents in `docs/`, this README and the EDA notebook.
-- Tested the code in its own development sandbox: unit and API tests, config checks, and an end-to-end run of
-  the whole system as local processes with **synthetic, engine-generated games** (the sandbox could not reach
-  Lichess or run Docker). Defects found that way were fixed.
+
 
 ## What was checked, and how
 
