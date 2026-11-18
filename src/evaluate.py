@@ -81,6 +81,7 @@ def save_charts(test, band_mae, importance):
 
 
 def main():
+    """Score the candidate on the test players, write metrics and plots, and log them to MLflow."""
     params = load_params()
     df = pd.read_parquet(ROOT / "data" / "features" / "features.parquet").dropna(subset=["rating"])
     df["split"] = assign_split(df["player"], params["train"]["seed"])

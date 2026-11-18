@@ -60,6 +60,7 @@ def sample_games(lines, out, edges, quota, max_read, progress=None):
 
 
 def main():
+    """Stream the month's Lichess file and keep up to games_per_band blitz games per rating band."""
     params = load_params()
     cfg = params["ingest"]
     source = cfg["source"].format(month=params["month"])
@@ -69,6 +70,7 @@ def main():
     start = time.time()
 
     def progress(read, kept):
+        """Log how many games were read and kept so far, and the speed."""
         rate = read / (time.time() - start)
         log.info("read %d games, kept %d (%.0f games/s)", read, kept, rate)
 

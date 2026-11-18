@@ -16,6 +16,7 @@ from chessfeat.parse import iter_game_texts  # noqa: E402
 
 
 def one_request(api, text):
+    """Send one game and return (status code, seconds); status 0 if the request failed."""
     start = time.perf_counter()
     try:
         status = requests.post(f"{api}/api/v1/predict", json={"pgn": text}, timeout=300).status_code
@@ -25,6 +26,7 @@ def one_request(api, text):
 
 
 def main():
+    """Send games from several clients at once and print throughput and latency percentiles."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://localhost:8080")
     parser.add_argument("--clients", type=int, default=4)

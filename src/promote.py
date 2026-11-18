@@ -47,6 +47,7 @@ def decide(challenger, champion_mae, cfg):
 
 
 def alias_version(client, name, alias):
+    """The version an alias points to, or None if the alias is not set."""
     try:
         return client.get_model_version_by_alias(name, alias).version
     except MlflowException:
@@ -65,17 +66,20 @@ def set_alias(client, name, alias, version):
 
 
 def load_test_split(params):
+    """The test players' rows, split exactly as in training."""
     df = pd.read_parquet(ROOT / "data" / "features" / "features.parquet").dropna(subset=["rating"])
     df["split"] = assign_split(df["player"], params["train"]["seed"])
     return df[df["split"] == "test"]
 
 
 def model_mae(uri, test):
+    """Mean absolute error of a registered model on the given rows."""
     out = mlflow.pyfunc.load_model(uri).predict(test[FEATURES].astype("float64"))
     return float(np.mean(np.abs(out["mid"].to_numpy() - test["rating"].to_numpy())))
 
 
 def smoke_games(count):
+    """The first `count` valid games, used for the smoke test."""
     with open(ROOT / "data" / "valid" / "games.pgn") as handle:
         texts = []
         for _, text in iter_game_texts(handle):
@@ -86,6 +90,7 @@ def smoke_games(count):
 
 
 def backend_reachable():
+    """True if the backend answers its health check."""
     try:
         return requests.get(f"{BACKEND_URL}/healthz", timeout=3).ok
     except requests.RequestException:
@@ -127,6 +132,7 @@ def smoke_test(expected_version, games, timeout_s):
 
 
 def main():
+    """Apply the promotion gate, move the aliases, run the smoke test and roll back if it fails."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke-only", action="store_true", help="only smoke-test the current champion")
     args = parser.parse_args()

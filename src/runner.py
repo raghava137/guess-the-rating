@@ -43,11 +43,13 @@ current = {"run": None}
 
 
 class RunRequest(BaseModel):
+    """Body of POST /run: the month to use and what started the run."""
     month: str | None = Field(None, pattern=r"^(next|\d{4}-\d{2})$")
     trigger: str = Field("manual", pattern=r"^(" + "|".join(TRIGGERS) + ")$")
 
 
 def next_month(month):
+    """The month after a 'YYYY-MM' month, e.g. 2026-12 -> 2027-01."""
     year, mon = map(int, month.split("-"))
     return f"{year + mon // 12}-{mon % 12 + 1:02d}"
 
@@ -78,6 +80,7 @@ def parse_stage_line(line):
 def run_summary():
     """Throughput of the data stages and the promotion decision, read from the stage reports."""
     def report(name):
+        """Read a stage's JSON report, or {} if it is missing or unreadable."""
         try:
             return json.loads((ROOT / "results" / f"{name}.json").read_text())
         except (OSError, ValueError):
@@ -98,6 +101,7 @@ def run_summary():
 
 
 def load_history():
+    """All finished runs from the history file, oldest first."""
     if not HISTORY.exists():
         return []
     return [json.loads(line) for line in HISTORY.read_text().splitlines() if line.strip()]
@@ -110,6 +114,7 @@ def execute(run):
     started, stage, stage_start = time.time(), None, None
 
     def close_stage(status):
+        """Record the time and status of the stage that just ended."""
         if stage and stage_start:
             seconds = round(time.time() - stage_start, 1)
             run["stages"][stage] = {"status": status, "seconds": seconds}
@@ -171,6 +176,7 @@ def start_run(month, trigger):
 
 
 def finish(run):
+    """Run the pipeline in a background thread and always release the lock afterwards."""
     try:
         execute(run)
     finally:
@@ -181,22 +187,26 @@ def finish(run):
 
 @app.get("/healthz")
 def healthz():
+    """Health check for Prometheus and the backend."""
     return {"status": "ok", "running": current["run"] is not None}
 
 
 @app.get("/status")
 def status():
+    """The run in progress, the last run and the stage names."""
     history = load_history()
     return {"running": current["run"], "last": history[-1] if history else None, "stages": STAGES}
 
 
 @app.get("/runs")
 def runs(limit: int = 20):
+    """Run history, newest first."""
     return list(reversed(load_history()))[:limit]
 
 
 @app.get("/runs/{run_id}/log")
 def run_log(run_id: str, tail: int = 400):
+    """The last lines of one run's log."""
     if not re.fullmatch(r"\d{8}-\d{6}", run_id):
         raise HTTPException(422, "bad run id")
     path = RUNS_DIR / f"{run_id}.log"
@@ -207,6 +217,7 @@ def run_log(run_id: str, tail: int = 400):
 
 @app.post("/run", status_code=202)
 def run_pipeline(request: RunRequest):
+    """Start a run in the background; 409 if one is already running."""
     try:
         run = start_run(request.month, request.trigger)
     except RuntimeError as exc:
@@ -217,6 +228,7 @@ def run_pipeline(request: RunRequest):
 
 @app.get("/metrics")
 def metrics():
+    """Prometheus metrics of the runner."""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 

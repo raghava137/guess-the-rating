@@ -49,6 +49,7 @@ def merge(results):
 
 
 def main():
+    """Check every raw game in parallel with Ray tasks and write the valid ones to data/valid/games.pgn."""
     params = load_params()
     workers = params["validate"]["workers"]
     with open(ROOT / "data" / "raw" / "games.pgn") as handle:

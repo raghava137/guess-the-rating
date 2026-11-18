@@ -58,10 +58,12 @@ class Analyzer:
         return evals, best, moves, phases
 
     def close(self):
+        """Stop the Stockfish process."""
         self.engine.quit()
 
 
 def cap(value):
+    """Limit an evaluation to +-CAP centipawns so a mate score does not swamp the average."""
     return max(-CAP, min(CAP, value))
 
 
@@ -73,6 +75,7 @@ def terminal_eval(board):
 
 
 def non_pawn_material(board, color):
+    """Material of one side without pawns, used to tell when the endgame starts."""
     return sum(value * len(board.pieces(piece, color)) for piece, value in PIECE_VALUES.items())
 
 
@@ -86,6 +89,7 @@ def phase_of(board, ply_index, endgame_material):
 
 
 def mean_or_nan(values):
+    """Average of a list, or NaN when it is empty (LightGBM treats NaN as missing)."""
     return sum(values) / len(values) if values else float("nan")
 
 

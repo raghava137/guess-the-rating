@@ -121,6 +121,7 @@ class LiveMonitor:
         self.lock = threading.Lock()
 
     def add(self, rows, players):
+        """Add the players of one prediction to the drift and accuracy windows."""
         with self.lock:
             self.inputs.extend({f: row[f] for f in DRIFT_FEATURES} for row in rows)
             for p in players:
@@ -129,12 +130,14 @@ class LiveMonitor:
             self.update_gauges()
 
     def set_reference(self, reference):
+        """Use a new model's training distribution as the drift reference."""
         with self.lock:
             self.reference = reference
             self.errors.clear()                       # a new model starts with a fresh accuracy window
             self.update_gauges()
 
     def update_gauges(self):
+        """Recompute PSI per feature and the live MAE and coverage gauges."""
         if self.reference is not None and len(self.inputs) >= DRIFT_MIN:
             for feature in DRIFT_FEATURES:
                 PSI.labels(feature).set(psi(self.reference[feature], [row[feature] for row in self.inputs]))
@@ -154,6 +157,7 @@ class PredictionLog:
             log.warning("FERNET_KEY not set: predictions will not be logged")
 
     def write(self, record):
+        """Append one encrypted record to the prediction log (skipped when no key is set)."""
         if not self.fernet:
             return
         token = self.fernet.encrypt(json.dumps(record, default=str).encode())
@@ -162,6 +166,7 @@ class PredictionLog:
 
 
 def serving_settings():
+    """Stockfish settings from params.yaml, so live games are analysed exactly like the training games."""
     cfg = load_params()["featurize"]
     return {k: cfg[k] for k in ("depth", "hash_mb", "max_plies", "endgame_material")}
 
@@ -222,6 +227,7 @@ def served_version():
 
 
 def runner(method, path, **kwargs):
+    """Call the pipeline runner's API and pass its errors on to the web page."""
     response = call_with_retries(method, f"{RUNNER_URL}{path}", attempts=2, timeout=10, **kwargs)
     if not response.ok:
         raise HTTPException(response.status_code, response.json().get("detail", response.text[:200]))
@@ -239,6 +245,7 @@ def lichess_game_id(text):
 
 
 def fetch_lichess(game_id):
+    """Download one game's PGN, with clock times, from the Lichess export API."""
     response = call_with_retries("GET", LICHESS_EXPORT.format(game_id), timeout=10,
                                  headers={"Accept": "application/x-chess-pgn", "User-Agent": "guess-the-rating"})
     if response.status_code == 404:
@@ -268,6 +275,7 @@ def refresh_model_info(version):
 
 
 def probe_once():
+    """Check once which components answer, set chess_component_up, and notice a new model version."""
     checks = {"frontend": f"{FRONTEND_URL}/", "mlflow": f"{MLFLOW_URL}/health", "pipeline": f"{RUNNER_URL}/healthz"}
     for name, url in checks.items():
         try:
@@ -286,6 +294,7 @@ def probe_once():
 
 
 def prober():
+    """Background thread: run the health probe every PROBE_SECONDS."""
     while True:
         try:
             probe_once()
@@ -296,6 +305,7 @@ def prober():
 
 @asynccontextmanager
 async def lifespan(app):
+    """Start the health prober when the app starts (switched off in tests)."""
     if os.environ.get("DISABLE_PROBER") != "1":
         threading.Thread(target=prober, daemon=True).start()
     yield
@@ -322,28 +332,33 @@ async def timing(request: Request, call_next):
 
 @app.exception_handler(Exception)
 def unexpected_error(request: Request, exc: Exception):
+    """Log any unhandled error and return a plain 500 message instead of a stack trace."""
     log.error("unhandled error on %s", request.url.path, exc_info=exc)
     return JSONResponse(status_code=500, content={"detail": "Internal error. It has been logged."})
 
 
 def require_admin(token):
+    """Reject the request unless it carries the admin token from .env (constant-time comparison)."""
     if not ADMIN_TOKEN or not hmac.compare_digest((token or "").encode(), ADMIN_TOKEN.encode()):
         raise HTTPException(401, "A valid admin token is required for this action.")
 
 
 # ---------------------------------------------------------------- request models
 class PredictRequest(BaseModel):
+    """Body of POST /api/v1/predict: either a PGN or a Lichess link."""
     pgn: str | None = Field(None, max_length=100_000, description="PGN text of one game, with clock comments")
     url: str | None = Field(None, max_length=200, description="Lichess game link or game ID")
 
 
 class RunRequest(BaseModel):
+    """Body of POST /api/v1/pipeline/run: the month to train on (none = same month)."""
     month: str | None = Field(None, pattern=r"^(next|\d{4}-\d{2})$")
 
 
 # ---------------------------------------------------------------- prediction endpoints
 @app.post("/api/v1/predict")
 def predict(body: PredictRequest, request: Request):
+    """Check the game, analyse it with Stockfish, ask the model server, and return each player's estimate."""
     if bool(body.pgn) == bool(body.url):
         raise HTTPException(422, "Send either a PGN or a Lichess link, not both.")
     source = "url" if body.url else "pgn"
@@ -410,6 +425,7 @@ def examples(limit: int = 4):
 
 @app.get("/healthz")
 def healthz():
+    """Health check: the model version being served and which components are up."""
     version = served_version()
     return {"status": "ok" if version else "degraded", "model_version": version, "served_by": HOST,
             "components": state["components"]}
@@ -418,6 +434,7 @@ def healthz():
 # ---------------------------------------------------------------- model registry
 @app.get("/api/v1/model")
 def model_info():
+    """Registry versions and aliases, for the Models box on the Pipeline page."""
     try:
         client = mlflow.MlflowClient()
         aliases = dict(client.get_registered_model(MODEL_NAME).aliases)      # {"champion": "3", ...}
@@ -452,16 +469,19 @@ def rollback(x_admin_token: str | None = Header(None)):
 # ---------------------------------------------------------------- pipeline console and alerts
 @app.get("/api/v1/pipeline/status")
 def pipeline_status():
+    """The run in progress and the last finished run, from the runner."""
     return runner("GET", "/status")
 
 
 @app.get("/api/v1/pipeline/runs")
 def pipeline_runs(limit: int = 20):
+    """Run history, newest first (at most 100)."""
     return runner("GET", f"/runs?limit={min(limit, 100)}")
 
 
 @app.get("/api/v1/pipeline/runs/{run_id}/log")
 def pipeline_log(run_id: str):
+    """The log of one run; the run ID is checked before it is passed on."""
     if not re.fullmatch(r"\d{8}-\d{6}", run_id):
         raise HTTPException(422, "bad run id")
     return runner("GET", f"/runs/{run_id}/log")
@@ -469,12 +489,14 @@ def pipeline_log(run_id: str):
 
 @app.post("/api/v1/pipeline/run", status_code=202)
 def pipeline_run(body: RunRequest, x_admin_token: str | None = Header(None)):
+    """Start a pipeline run (admin token required)."""
     require_admin(x_admin_token)
     return runner("POST", "/run", json={"month": body.month, "trigger": "manual"})
 
 
 @app.get("/api/v1/alerts")
 def list_alerts():
+    """The last alerts received from Alertmanager, newest first."""
     return list(reversed(alerts))
 
 
@@ -513,4 +535,5 @@ def maybe_retrain(alert_name):
 
 @app.get("/metrics")
 def metrics():
+    """Prometheus metrics of the backend."""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)

@@ -18,6 +18,7 @@ from chessfeat.parse import iter_game_texts  # noqa: E402
 
 
 def main():
+    """Send real games to the app one by one so the dashboards and the drift window fill."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://localhost:8080")
     parser.add_argument("--games", type=int, default=50)

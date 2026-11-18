@@ -13,8 +13,8 @@ stages:
       size: 5967
     - path: src/ingest.py
       hash: md5
-      md5: f6480455754d53bea7e08224876ecf31
-      size: 3393
+      md5: f85f664dcbcb77a5616bf78c89ca8253
+      size: 3569
     params:
       params.yaml:
         bands:
@@ -59,8 +59,8 @@ stages:
       size: 5967
     - path: src/validate.py
       hash: md5
-      md5: f6c81f4865d4627acfa2e3c0d944aabb
-      size: 2887
+      md5: 2c159e8a0f0c1bcb987bd4d3533d2b69
+      size: 2995
     outs:
     - path: data/valid/games.pgn
       hash: md5
@@ -79,12 +79,12 @@ stages:
       size: 47000262
     - path: src/chessfeat/features.py
       hash: md5
-      md5: d089e8c940ee1e0279f8b2b99d172a94
-      size: 7225
+      md5: 80f5b689963cc1ee9886efa7dc518f0c
+      size: 7532
     - path: src/featurize.py
       hash: md5
-      md5: 4930c55e51903037f68a601d0e1fe4b1
-      size: 3188
+      md5: fb310ce2061ce271ca15ba22f208ffec
+      size: 3461
     params:
       params.yaml:
         featurize.depth: 10
@@ -118,12 +118,12 @@ stages:
       size: 1351
     - path: src/chessfeat/model.py
       hash: md5
-      md5: 77713d31da842a0aa695797bbf1de182
-      size: 2227
+      md5: de6d7647eab6cfd4269f7458f736c79b
+      size: 2500
     - path: src/train.py
       hash: md5
-      md5: 223feb84243e3ace6cb6b8f4e140933c
-      size: 5283
+      md5: 167c8ab3d8df4e718580bcd1866d75e4
+      size: 5553
     params:
       params.yaml:
         model_name: chess-rating
@@ -168,8 +168,8 @@ stages:
       nfiles: 16
     - path: src/evaluate.py
       hash: md5
-      md5: e0c0ed480ff769c8ce233b224141672f
-      size: 6091
+      md5: e54eaa981ed051fb7b5e6f40bb73a5a5
+      size: 6191
     params:
       params.yaml:
         bands:
@@ -207,8 +207,8 @@ stages:
       size: 89
     - path: src/promote.py
       hash: md5
-      md5: fe19913949514db8586d566870ecbaf1
-      size: 8110
+      md5: 8ccaf76078d09d9ce4b5e41f9e4148db
+      size: 8542
     params:
       params.yaml:
         promote:

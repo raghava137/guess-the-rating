@@ -27,9 +27,11 @@ class FeatureWorker:
                                  max_plies=cfg["max_plies"], endgame_material=cfg["endgame_material"])
 
     def engine_version(self):
+        """Stockfish version string, recorded in the stage report."""
         return self.analyzer.version
 
     def run(self, texts):
+        """Turn a batch of PGN texts into feature rows; a game that fails is counted, not fatal."""
         from chessfeat.features import player_rows
         from chessfeat.parse import parse_pgn_text
         rows, errors = [], []
@@ -42,6 +44,7 @@ class FeatureWorker:
 
 
 def main():
+    """Analyse every valid game with a pool of Ray actors and write data/features/features.parquet."""
     params = load_params()
     cfg = params["featurize"]
     with open(ROOT / "data" / "valid" / "games.pgn") as handle:

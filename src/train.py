@@ -25,6 +25,7 @@ log = get_logger("train")
 
 
 def file_md5(path):
+    """MD5 of a file, logged so the exact feature file behind a model can be identified."""
     digest = hashlib.md5()
     with open(path, "rb") as handle:
         for block in iter(lambda: handle.read(1 << 20), b""):
@@ -33,6 +34,7 @@ def file_md5(path):
 
 
 def git_commit():
+    """The current Git commit, or 'unknown' outside a Git checkout."""
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
                               text=True, check=True).stdout.strip()
@@ -56,6 +58,7 @@ def fit(name, alpha, train, val, cfg):
 
 
 def main():
+    """Train the three quantile models, log them to MLflow as one model and register it as @challenger."""
     params = load_params()
     cfg, name = params["train"], params["model_name"]
     features_path = ROOT / "data" / "features" / "features.parquet"

@@ -24,6 +24,7 @@ POLL_SECONDS = int(os.environ.get("POLL_SECONDS", "30"))
 
 
 def champion_version(client):
+    """The version @champion points to, or None before the first model exists."""
     try:
         return client.get_model_version_by_alias(NAME, "champion").version
     except (MlflowException, requests.RequestException) as exc:
@@ -33,11 +34,13 @@ def champion_version(client):
 
 
 def port_in_use(port):
+    """True if something is listening on the port."""
     with socket.socket() as sock:
         return sock.connect_ex(("127.0.0.1", port)) == 0
 
 
 def start(version):
+    """Start `mlflow models serve` for one registry version."""
     env = {**os.environ, "MODEL_VERSION": version}
     command = ["mlflow", "models", "serve", "-m", f"models:/{NAME}/{version}", "--host", "0.0.0.0",
                "--port", str(PORT), "--env-manager", "local", "--workers", "1"]
@@ -59,6 +62,7 @@ def wait_ready(process, timeout=300):
 
 
 def stop(process):
+    """Stop the model server and wait until its port is free."""
     process.terminate()
     try:
         process.wait(timeout=30)
@@ -70,6 +74,7 @@ def stop(process):
 
 
 def main():
+    """Follow @champion: start or replace the model server when the alias moves or the server crashes."""
     client = mlflow.MlflowClient()
     process, started, serving, waiting_logged = None, None, None, False   # started: version of the process
     while True:

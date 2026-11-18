@@ -10,17 +10,20 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_params():
+    """Read params.yaml."""
     with open(ROOT / "params.yaml") as handle:
         return yaml.safe_load(handle)
 
 
 def write_json(path, data):
+    """Write a JSON report under the repo root, creating its folder if needed."""
     path = ROOT / path
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, default=str))
 
 
 def read_json(path):
+    """Read a JSON report written by an earlier stage."""
     return json.loads((ROOT / path).read_text())
 
 

@@ -21,6 +21,7 @@ QUANTILES = {"low": 0.1, "mid": 0.5, "high": 0.9}
 def assign_split(players, seed, train_pct=70, val_pct=15):
     """Deterministic train/val/test split by player, so no player appears in two splits."""
     def bucket(player):
+        """Stable bucket 0-99 for a player, from a hash of the seed and the player's name."""
         return int(hashlib.md5(f"{seed}:{player}".encode()).hexdigest(), 16) % 100
 
     return [("train" if b < train_pct else "val" if b < train_pct + val_pct else "test")
@@ -31,12 +32,14 @@ class RatingRangeModel(mlflow.pyfunc.PythonModel):
     """Loads the three boosters and returns low / mid / high, reasons and model_version."""
 
     def load_context(self, context):
+        """Load the three LightGBM boosters when MLflow loads the model."""
         import lightgbm as lgb
         self.boosters = {name: lgb.Booster(model_file=context.artifacts[name]) for name in QUANTILES}
         # Set by serve_champion.py when it starts the server for a registry version.
         self.version = os.environ.get("MODEL_VERSION", "local")
 
     def predict(self, context, model_input, params=None):
+        """Return low, mid and high for each row, with the top three reasons and the model version."""
         features = pd.DataFrame(model_input).reindex(columns=FEATURES).astype("float64")
         low, mid, high = (self.boosters[name].predict(features) for name in QUANTILES)
         low, high = np.minimum(low, mid), np.maximum(high, mid)     # quantile models can cross
