@@ -94,6 +94,10 @@ On a smaller machine (for example a VM with 6 CPUs and 5 GB), lower the parallel
 Stop everything with `docker compose down`. Data, models, logs and the MLflow database stay in
 the repo folder (`data/`, `models/`, `logs/`, `mlflow-data/`) and are reused next time.
 
+## Demo:
+
+https://drive.google.com/file/d/1dC3umMgFmd_UYckrEtTDZUvaZF8M2AMP/view?usp=sharing
+
 ## Where to look
 
 | What | Address |
